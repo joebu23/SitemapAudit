@@ -252,18 +252,8 @@ def worker_loop(
             total = progress["total"]
 
         if r.timed_out:
-            print(f"[{done}/{total}] TIMEOUT (ABORT) {url} :: {r.error}")
-            stop_event.set()
-            # Drain remaining items so threads exit fast
-            try:
-                while True:
-                    q.get_nowait()
-                    q.task_done()
-            except queue.Empty:
-                pass
-            q.task_done()
-            return
-
+            # Keep going: record timeout and continue
+            print(f"[{done}/{total}] TIMEOUT {url} :: {r.error}")
         if r.error:
             print(f"[{done}/{total}] ERROR {url} :: {r.error}")
         elif r.itm_guids:
